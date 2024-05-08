@@ -35,37 +35,10 @@ app.get("/api/courses", async (req, res) => {
 });
 
 // Using Get method to get a single item in the api list by index
-app.get("/api/courses/index/:index", async (req, res) => {
+app.get("/api/courses/:id", async (req, res) => {
   try {
-    const courses = await Course.find();
-    const index = parseInt(req.params.index);
-    if (index >= 0 && index < courses.length) {
-      res.send(courses[index]);
-    } else {
-      res.status(404).send("Index out of range");
-    }
-  } catch (error) {
-    res.status(500).send("Error retrieving course");
-  }
-});
-
-// Get API Method by ID or index
-app.get("/api/courses/:idOrIndex", async (req, res) => {
-  try {
-    const idOrIndex = req.params.idOrIndex;
-    let course;
-
-    if (!isNaN(idOrIndex)) {
-      // If it's a number, treat it as an index
-      const courses = await Course.find();
-      const index = parseInt(idOrIndex);
-      if (index >= 0 && index < courses.length) {
-        course = courses[index];
-      }
-    } else {
-      // Otherwise, treat it as an ID
-      course = await Course.findById(idOrIndex);
-    }
+    const courseId = req.params.id;
+    const course = await Course.findById(courseId);
 
     if (!course) {
       return res.status(404).send("Course not found");
@@ -76,6 +49,21 @@ app.get("/api/courses/:idOrIndex", async (req, res) => {
   }
 });
 
+// Get API Method by index
+app.get("/api/courses/index/:index", async (req, res) => {
+  try {
+    const index = parseInt(req.params.index);
+    const courses = await Course.find();
+
+    if (index >= 0 && index < courses.length) {
+      res.send(courses[index]);
+    } else {
+      res.status(404).send("Index out of range");
+    }
+  } catch (error) {
+    res.status(500).send("Error retrieving course");
+  }
+});
 // Post Method
 app.post("/api/courses", async (req, res) => {
   const { name, course, time_slot, other_properties } = req.body;
@@ -133,7 +121,9 @@ app.put("/api/courses/:idOrIndex", async (req, res) => {
     }
 
     if (!updatedCourse) {
-      return res.status(404).send("The course with the given ID or index was not found");
+      return res
+        .status(404)
+        .send("The course with the given ID or index was not found");
     }
 
     res.send(updatedCourse);

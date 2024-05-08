@@ -96,31 +96,52 @@ app.post("/api/courses", async (req, res) => {
 });
 
 // Put Method
-app.put("/api/courses/:id", async (req, res) => {
+app.patch("/api/courses/:idOrIndex", async (req, res) => {
   const { name, course, time_slot, other_properties } = req.body;
 
   try {
-    const updatedCourse = await Course.findByIdAndUpdate(
-      req.params.id,
-      {
-        name,
-        course,
-        time_slot,
-        other_properties,
-      },
-      { new: true }
-    );
+    let updatedCourse;
+    const idOrIndex = req.params.idOrIndex;
+
+    if (!isNaN(idOrIndex)) {
+      // If it's a number, treat it as an index
+      const courses = await Course.find();
+      const index = parseInt(idOrIndex);
+      if (index >= 0 && index < courses.length) {
+        updatedCourse = await Course.findByIdAndUpdate(
+          courses[index]._id,
+          {
+            name,
+            course,
+            time_slot,
+            other_properties,
+          },
+          { new: true }
+        );
+      }
+    } else {
+      // Otherwise, treat it as an ID
+      updatedCourse = await Course.findByIdAndUpdate(
+        idOrIndex,
+        {
+          name,
+          course,
+          time_slot,
+          other_properties,
+        },
+        { new: true }
+      );
+    }
 
     if (!updatedCourse) {
-      return res.status(404).send("The course with the given ID was not found");
+      return res.status(404).send("Course not found");
     }
 
     res.send(updatedCourse);
   } catch (error) {
-    res.status(400).send("Error updating course");
+    res.status(500).send("Error updating course");
   }
 });
-
 // Delete Method
 app.delete("/api/courses/:id", async (req, res) => {
   try {

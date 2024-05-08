@@ -34,9 +34,7 @@ app.get("/api/courses", async (req, res) => {
   }
 });
 
-// Using Get method to get a single item in the api list
-
-// Using Get method to get a single item in the API list by index
+// Using Get method to get a single item in the api list by index
 app.get("/api/courses/index/:index", async (req, res) => {
   try {
     const courses = await Course.find();
@@ -56,6 +54,7 @@ app.get("/api/courses/:idOrIndex", async (req, res) => {
   try {
     const idOrIndex = req.params.idOrIndex;
     let course;
+
     if (!isNaN(idOrIndex)) {
       // If it's a number, treat it as an index
       const courses = await Course.find();
@@ -95,7 +94,6 @@ app.post("/api/courses", async (req, res) => {
   }
 });
 
-// Put Method
 // Put Method to update course by ID or index
 app.put("/api/courses/:idOrIndex", async (req, res) => {
   const { name, course, time_slot, other_properties } = req.body;
@@ -135,9 +133,7 @@ app.put("/api/courses/:idOrIndex", async (req, res) => {
     }
 
     if (!updatedCourse) {
-      return res
-        .status(404)
-        .send("The course with the given ID or index was not found");
+      return res.status(404).send("The course with the given ID or index was not found");
     }
 
     res.send(updatedCourse);

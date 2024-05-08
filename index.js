@@ -96,7 +96,8 @@ app.post("/api/courses", async (req, res) => {
 });
 
 // Put Method
-app.patch("/api/courses/:idOrIndex", async (req, res) => {
+// Put Method to update course by ID or index
+app.put("/api/courses/:idOrIndex", async (req, res) => {
   const { name, course, time_slot, other_properties } = req.body;
 
   try {
@@ -134,14 +135,17 @@ app.patch("/api/courses/:idOrIndex", async (req, res) => {
     }
 
     if (!updatedCourse) {
-      return res.status(404).send("Course not found");
+      return res
+        .status(404)
+        .send("The course with the given ID or index was not found");
     }
 
     res.send(updatedCourse);
   } catch (error) {
-    res.status(500).send("Error updating course");
+    res.status(400).send("Error updating course");
   }
 });
+
 // Delete Method
 app.delete("/api/courses/:id", async (req, res) => {
   try {
